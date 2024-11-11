@@ -2,20 +2,20 @@ using System.Collections.Concurrent;
 
 namespace Aiursoft.InMemoryKvDb.AutoCreate;
 
-public class LruMemoryStore<T>(Func<Guid, T> onNotFound, int maxCachedItemsCount)
+public class LruMemoryStore<T, TK>(Func<TK, T> onNotFound, int maxCachedItemsCount) where TK : notnull
 {
-    private readonly Func<Guid, T> _onNotFound = onNotFound ?? throw new ArgumentNullException(nameof(onNotFound));
-    private readonly ConcurrentDictionary<Guid, T> _store = new();
-    private readonly LinkedList<Guid> _lruList = new();
+    private readonly Func<TK, T> _onNotFound = onNotFound ?? throw new ArgumentNullException(nameof(onNotFound));
+    private readonly ConcurrentDictionary<TK, T> _store = new();
+    private readonly LinkedList<TK> _lruList = new();
     private readonly object _lruLock = new();
 
-    public T this[Guid id]
+    public T this[TK id]
     {
         get => GetOrAdd(id);
         set => AddToCache(id, value);
     }
 
-    public T GetOrAdd(Guid id)
+    public T GetOrAdd(TK id)
     {
         if (_store.TryGetValue(id, out var value))
         {
@@ -28,7 +28,7 @@ public class LruMemoryStore<T>(Func<Guid, T> onNotFound, int maxCachedItemsCount
         return value;
     }
     
-    public T? Get(Guid id)
+    public T? Get(TK id)
     {
         if (_store.TryGetValue(id, out var value))
         {
@@ -48,8 +48,16 @@ public class LruMemoryStore<T>(Func<Guid, T> onNotFound, int maxCachedItemsCount
             return _store.Values.ToList();
         }
     }
+    
+    public IEnumerable<KeyValuePair<TK, T>> GetAllWithKeys()
+    {
+        lock (_lruLock)
+        {
+            return _store.ToList();
+        }
+    }
 
-    private void UpdateLru(Guid id)
+    private void UpdateLru(TK id)
     {
         lock (_lruLock)
         {
@@ -58,7 +66,7 @@ public class LruMemoryStore<T>(Func<Guid, T> onNotFound, int maxCachedItemsCount
         }
     }
 
-    private void AddToCache(Guid id, T value)
+    private void AddToCache(TK id, T value)
     {
         lock (_lruLock)
         {

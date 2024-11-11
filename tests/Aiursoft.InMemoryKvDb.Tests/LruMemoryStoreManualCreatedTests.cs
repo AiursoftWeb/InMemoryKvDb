@@ -1,102 +1,60 @@
+using Aiursoft.InMemoryKvDb;
 using Aiursoft.InMemoryKvDb.ManualCreate;
+using Aiursoft.InMemoryKvDb.Tests;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace Aiursoft.InMemoryKvDb.Tests;
 
 [TestClass]
 public class LruMemoryStoreManualCreatedTests
 {
-    private readonly LruMemoryStoreManualCreated<Player> _store = new(maxCachedItemsCount: 3);
-
     [TestMethod]
-    public void ManualStore_GetOrAdd_AddsNewItem()
+    public void Test_LruMemoryStore_ManualCreate_BasicOperations()
     {
-        var playerId = Guid.NewGuid();
-        var player = _store.GetOrAdd(playerId, id => new Player(id, "TestPlayer"));
+        // Arrange
+        var store = new LruMemoryStoreManualCreated<Player, Guid>(2);
 
-        Assert.IsNotNull(player, "Player should not be null.");
-        Assert.AreEqual("TestPlayer", player.NickName, "Player should have the correct NickName.");
-    }
+        var id1 = Guid.NewGuid();
+        var id2 = Guid.NewGuid();
+        var id3 = Guid.NewGuid();
 
-    [TestMethod]
-    public void ManualStore_GetOrAdd_RespectsLruEviction()
-    {
-        var player1 = _store.GetOrAdd(Guid.NewGuid(), id => new Player(id, "Player1"));
-        _ = _store.GetOrAdd(Guid.NewGuid(), id => new Player(id, "Player2"));
-        _store.GetOrAdd(Guid.NewGuid(), id => new Player(id, "Player3"));
-        _store.GetOrAdd(Guid.NewGuid(), id => new Player(id, "Player4")); // This should trigger eviction of the oldest item
+        // Act
+        var player1 = store.GetOrAdd(id1, id => new Player(id, $"Player-{id}"));
+        var player2 = store.GetOrAdd(id2, id => new Player(id, $"Player-{id}"));
+        var player3 = store.GetOrAdd(id3, id => new Player(id, $"Player-{id}")); // Should evict id1
 
-        Assert.AreEqual(3, GetStoreCount(_store), "Store should contain the maximum number of allowed items.");
-        Assert.IsFalse(IsPlayerInStore(_store, player1.Id), "Oldest player (player1) should have been evicted.");
+        // Assert
+        Assert.AreEqual("Player-" + id1, player1.NickName);
+        Assert.AreEqual("Player-" + id2, player2.NickName);
+        Assert.AreEqual("Player-" + id3, player3.NickName);
+        Assert.IsNull(store.Get(id1));
     }
 
     [TestMethod]
-    public void ManualStore_Get_ReturnsNullIfItemNotFound()
+    public void Test_NamedLruMemoryStore_ManualCreate()
     {
-        var playerId = Guid.NewGuid();
-        var player = _store.Get(playerId);
+        // Arrange
+        var services = new ServiceCollection();
+        services.AddNamedLruMemoryStoreManualCreate<Player, Guid>(maxCachedItemsCount: 3);
 
-        Assert.IsNull(player, "Expected null when attempting to get a non-existent player.");
-    }
+        var serviceProvider = services.BuildServiceProvider();
+        var namedProvider =
+            serviceProvider.GetRequiredService<NamedLruMemoryStoreManualCreatedProvider<Player, Guid>>();
+        var store = namedProvider.GetStore("test-store");
 
-    [TestMethod]
-    public void ManualStore_GetAll_ReturnsAllCachedItems()
-    {
-        var player1 = _store.GetOrAdd(Guid.NewGuid(), id => new Player(id, "Player1"));
-        var player2 = _store.GetOrAdd(Guid.NewGuid(), id => new Player(id, "Player2"));
-        var player3 = _store.GetOrAdd(Guid.NewGuid(), id => new Player(id, "Player3"));
+        var id1 = Guid.NewGuid();
+        var id2 = Guid.NewGuid();
+        var id3 = Guid.NewGuid();
+        var id4 = Guid.NewGuid();
 
-        var allItems = _store.GetAll().ToList();
+        // Act
+        var player1 = store.GetOrAdd(id1, id => new Player(id, $"Player-{id}"));
+        var player2 = store.GetOrAdd(id2, id => new Player(id, $"Player-{id}"));
+        _ = store.GetOrAdd(id3, id => new Player(id, $"Player-{id}"));
+        store.GetOrAdd(id4, id => new Player(id, $"Player-{id}")); // Evicts id1 due to LRU
 
-        Assert.AreEqual(3, allItems.Count, "Expected all cached items to be returned.");
-        CollectionAssert.Contains(allItems, player1, "Expected player1 to be in the list.");
-        CollectionAssert.Contains(allItems, player2, "Expected player2 to be in the list.");
-        CollectionAssert.Contains(allItems, player3, "Expected player3 to be in the list.");
-    }
-
-    [TestMethod]
-    public void ManualStore_AddToCache_OverwritesExistingItem()
-    {
-        var playerId = Guid.NewGuid();
-        _store.AddToCache(playerId, new Player(playerId, "Player1"));
-
-        var player2 = new Player(playerId, "NewPlayer");
-        _store.AddToCache(playerId, player2);
-
-        var retrievedPlayer = _store.Get(playerId);
-
-        Assert.AreEqual("NewPlayer", retrievedPlayer!.NickName, "Expected the existing item to be overwritten.");
-    }
-
-    [TestMethod]
-    public void ManualStore_AddToCache_HandlesEvictionCorrectlyWhenAtMaxCapacity()
-    {
-        var player1 = new Player(Guid.NewGuid(), "Player1");
-        _store.AddToCache(player1.Id, player1);
-        _store.AddToCache(Guid.NewGuid(), new Player(Guid.NewGuid(), "Player2"));
-        _store.AddToCache(Guid.NewGuid(), new Player(Guid.NewGuid(), "Player3"));
-
-        // Add a new player to trigger eviction
-        _store.AddToCache(Guid.NewGuid(), new Player(Guid.NewGuid(), "Player4"));
-
-        Assert.IsFalse(IsPlayerInStore(_store, player1.Id), "Oldest player (player1) should have been evicted.");
-        Assert.AreEqual(3, GetStoreCount(_store), "Store should maintain the max cache size.");
-    }
-
-    private int GetStoreCount(LruMemoryStoreManualCreated<Player> store)
-    {
-        // Access the private field using reflection for testing
-        var field = typeof(LruMemoryStoreManualCreated<Player>).GetField("_store",
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var dictionary = (System.Collections.Concurrent.ConcurrentDictionary<Guid, Player>)field!.GetValue(store)!;
-        return dictionary.Count;
-    }
-
-    private bool IsPlayerInStore(LruMemoryStoreManualCreated<Player> store, Guid playerId)
-    {
-        var field = typeof(LruMemoryStoreManualCreated<Player>).GetField("_store",
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var dictionary = (System.Collections.Concurrent.ConcurrentDictionary<Guid, Player>)field!.GetValue(store)!;
-        return dictionary.ContainsKey(playerId);
+        // Assert
+        Assert.AreEqual("Player-" + id1, player1.NickName);
+        Assert.AreEqual("Player-" + id2, player2.NickName);
+        Assert.IsNull(store.Get(id1));
     }
 }

@@ -2,13 +2,13 @@ using System.Collections.Concurrent;
 
 namespace Aiursoft.InMemoryKvDb.ManualCreate;
 
-public class LruMemoryStoreManualCreated<T>(int maxCachedItemsCount)
+public class LruMemoryStoreManualCreated<T, TK>(int maxCachedItemsCount) where TK : notnull
 {
-    private readonly ConcurrentDictionary<Guid, T> _store = new();
-    private readonly LinkedList<Guid> _lruList = new();
+    private readonly ConcurrentDictionary<TK, T> _store = new();
+    private readonly LinkedList<TK> _lruList = new();
     private readonly object _lruLock = new();
 
-    public T GetOrAdd(Guid id, Func<Guid, T> onNotFound)
+    public T GetOrAdd(TK id, Func<TK, T> onNotFound)
     {
         if (_store.TryGetValue(id, out var value))
         {
@@ -21,7 +21,7 @@ public class LruMemoryStoreManualCreated<T>(int maxCachedItemsCount)
         return value;
     }
 
-    public T? Get(Guid id)
+    public T? Get(TK id)
     {
         if (_store.TryGetValue(id, out var value))
         {
@@ -32,17 +32,23 @@ public class LruMemoryStoreManualCreated<T>(int maxCachedItemsCount)
         return default;
     }
     
-    // 获取所有元素
     public IEnumerable<T> GetAll()
     {
         lock (_lruLock)
         {
-            // 返回所有元素的副本，以支持 LINQ 查询而不影响 LRU 逻辑
             return _store.Values.ToList();
         }
     }
+    
+    public IEnumerable<KeyValuePair<TK, T>> GetAllWithKeys()
+    {
+        lock (_lruLock)
+        {
+            return _store.ToList();
+        }
+    }
 
-    private void UpdateLru(Guid id)
+    private void UpdateLru(TK id)
     {
         lock (_lruLock)
         {
@@ -51,7 +57,7 @@ public class LruMemoryStoreManualCreated<T>(int maxCachedItemsCount)
         }
     }
 
-    public void AddToCache(Guid id, T value)
+    public void AddToCache(TK id, T value)
     {
         lock (_lruLock)
         {
