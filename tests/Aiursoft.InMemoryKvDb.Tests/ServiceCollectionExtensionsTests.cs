@@ -1,9 +1,9 @@
-using Aiursoft.InMemoryKvDb;
 using Aiursoft.InMemoryKvDb.AutoCreate;
 using Aiursoft.InMemoryKvDb.ManualCreate;
-using Aiursoft.InMemoryKvDb.Tests;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Aiursoft.InMemoryKvDb.Tests;
 
 [TestClass]
 public class ServiceCollectionExtensionsTests
