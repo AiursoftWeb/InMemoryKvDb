@@ -81,4 +81,13 @@ public class LruMemoryStore<T, TK>(Func<TK, T> onNotFound, int maxCachedItemsCou
             _lruList.AddLast(id);
         }
     }
+    
+    public void Remove(TK id)
+    {
+        lock (_lruLock)
+        {
+            _store.TryRemove(id, out _);
+            _lruList.Remove(id);
+        }
+    }
 }
