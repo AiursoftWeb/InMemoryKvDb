@@ -45,116 +45,72 @@ dotnet add package Aiursoft.InMemoryKvDb
 
 Add the service to your [`IServiceCollection`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.iservicecollection) in `Startup.cs` (or `Program.cs` in .NET 6 and later):
 
-### Registering and Using Aiursoft.InMemoryKvDb with Different Methods
+## Usage Methods
 
-#### 1. Service Registration Methods
+1. `AddNamedLruMemoryStore<T, TK>`
+2. `AddNamedLruMemoryStoreManualCreate<T, TK>`
+3. `AddLruMemoryStore<T, TK>`
+4. `AddLruMemoryStoreManualCreate<T, TK>`
 
-`Aiursoft.InMemoryKvDb` offers four different registration methods to suit varying caching needs. Choose the one that fits your requirements:
+### Differences and How to Choose
 
-##### 1.1 Using `AddNamedLruMemoryStore<T>`
+- **Named vs. Non-Named Stores**:
+    - **Named stores** (`AddNamedLruMemoryStore` and `AddNamedLruMemoryStoreManualCreate`) allow you to create multiple isolated caches identified by unique names, suitable for scenarios where you need separate caches within the same application.
+    - **Non-named stores** (`AddLruMemoryStore` and `AddLruMemoryStoreManualCreate`) are simpler and provide a single cache instance.
 
-This method registers a named `LruMemoryStore` provider, where each name is associated with a separate LRU store.
+- **Automatic vs. Manual Key-Value Creation**:
+    - **Automatic creation** (`AddLruMemoryStore` and `AddNamedLruMemoryStore`) uses an `onNotFound` function to generate values for missing keys automatically.
+    - **Manual creation** (`AddLruMemoryStoreManualCreate` and `AddNamedLruMemoryStoreManualCreate`) requires explicit value creation when adding items, providing greater control over how values are added to the cache.
 
-```csharp
-services.AddNamedLruMemoryStore<Player>(
-    id => new Player(id) { NickName = "Anonymous " + new Random().Next(1000, 9999) },
-    maxCachedItemsCount: 4096);
-```
+### Example Usages
 
-- **`onNotFound`**: A custom creation function that generates a new item when it is not found.
-- **`maxCachedItemsCount`**: Sets the maximum cache size. When this limit is exceeded, the LRU eviction mechanism is triggered.
-
-##### 1.2 Using `AddNamedLruMemoryStoreManualCreate<T>`
-
-This method also registers a named `LruMemoryStore` provider, but it does not automatically invoke `onNotFound` when a new item needs to be created. Creation logic is managed manually.
+#### 1. Using `AddNamedLruMemoryStore<T, TK>`
 
 ```csharp
-services.AddNamedLruMemoryStoreManualCreate<Player>(maxCachedItemsCount: 2048);
+var services = new ServiceCollection();
+services.AddNamedLruMemoryStore<Player, Guid>(
+    id => new Player(id, "GeneratedPlayer"),
+    maxCachedItemsCount: 5);
+var serviceProvider = services.BuildServiceProvider();
+var namedProvider = serviceProvider.GetService<NamedLruMemoryStoreProvider<Player, Guid>>();
+var store = namedProvider.GetStore("player-store");
+var player = store.GetOrAdd(Guid.NewGuid());
 ```
 
-- Suitable for scenarios where auto-creation is not required or item generation needs manual control.
-
-##### 1.3 Using `AddLruMemoryStore<T>`
-
-This method registers a regular `LruMemoryStore` that is not name-based, treating each store instance as a standalone entity.
+#### 2. Using `AddNamedLruMemoryStoreManualCreate<T, TK>`
 
 ```csharp
-services.AddLruMemoryStore<Player>(
-    id => new Player(id) { NickName = "Guest" + new Random().Next(1000, 9999) },
-    maxCachedItemsCount: 1024);
+var services = new ServiceCollection();
+services.AddNamedLruMemoryStoreManualCreate<Player, Guid>(maxCachedItemsCount: 5);
+var serviceProvider = services.BuildServiceProvider();
+var namedProvider = serviceProvider.GetService<NamedLruMemoryStoreManualCreatedProvider<Player, Guid>>();
+var store = namedProvider.GetStore("player-store");
+var player = store.GetOrAdd(Guid.NewGuid(), id => new Player(id, "ManualPlayer"));
 ```
 
-- `LruMemoryStore` is suitable for simpler scenarios where named namespace management or switching between store instances is not necessary.
-
-##### 1.4 Using `AddLruMemoryStoreManualCreate<T>`
-
-This method is similar to `AddLruMemoryStore`, but it does not auto-create new items, requiring manual addition and management.
+#### 3. Using `AddLruMemoryStore<T, TK>`
 
 ```csharp
-services.AddLruMemoryStoreManualCreate<Player>(maxCachedItemsCount: 512);
+var services = new ServiceCollection();
+services.AddLruMemoryStore<Player, Guid>(
+    id => new Player(id, "GeneratedPlayer"),
+    maxCachedItemsCount: 3);
+var serviceProvider = services.BuildServiceProvider();
+var store = serviceProvider.GetService<LruMemoryStore<Player, Guid>>();
+var player = store.GetOrAdd(Guid.NewGuid());
 ```
 
-- Best suited for flexible data item management or specific creation control requirements.
-
----
-
-#### 2. Accessing the Store
-
-##### 2.1 Accessing `NamedLruMemoryStoreProvider<T>`
-
-When using `AddNamedLruMemoryStore` or `AddNamedLruMemoryStoreManualCreate`, you can access specific named stores through `NamedLruMemoryStoreProvider<T>`.
+#### 4. Using `AddLruMemoryStoreManualCreate<T, TK>`
 
 ```csharp
-var namedProvider = serviceProvider.GetRequiredService<NamedLruMemoryStoreProvider<Player>>();
-var normalPlayerDb = namedProvider.GetStore("NormalPlayerDb");
-var highLevelPlayerDb = namedProvider.GetStore("HighLevelPlayerDb");
-
-// Retrieve or add a player
-var playerId = Guid.NewGuid();
-var player = normalPlayerDb.GetOrAdd(playerId);
+var services = new ServiceCollection();
+services.AddLruMemoryStoreManualCreate<Player, Guid>(maxCachedItemsCount: 3);
+var serviceProvider = services.BuildServiceProvider();
+var store = serviceProvider.GetService<LruMemoryStoreManualCreated<Player, Guid>>();
+var player = store.GetOrAdd(Guid.NewGuid(), id => new Player(id, "ManualPlayer"));
 ```
 
-##### 2.2 Accessing `LruMemoryStore<T>`
-
-When using `AddLruMemoryStore` or `AddLruMemoryStoreManualCreate`, you can directly use the store instance.
-
-```csharp
-var store = serviceProvider.GetRequiredService<LruMemoryStore<Player>>();
-var playerId = Guid.NewGuid();
-var player = store.GetOrAdd(playerId);
-```
-
----
-
-#### 3. LRU Eviction Mechanism
-
-Regardless of the chosen storage type, all instances follow the LRU (Least Recently Used) strategy. When the cache reaches its maximum capacity, the least recently used items will be automatically evicted to free up space.
-
-#### 4. Configuration Options
-
-- `maxCachedItemsCount`: Controls the maximum cache size, triggering eviction when this limit is exceeded.
-- `onNotFound` (for auto-creating stores only): A custom function to generate new items when they are not found.
-
----
-
-#### Example Scenario
-
-```csharp
-services.AddNamedLruMemoryStore<Player>(
-    id => new Player(id) { NickName = "Guest" + new Random().Next(1000, 9999) },
-    maxCachedItemsCount: 2048);
-```
-
-By using `AddNamedLruMemoryStore`, you can efficiently cache player data across different namespaces while ensuring controlled memory usage, reducing the risk of `OutOfMemoryException`.
-
----
-
-### Choosing the Right Method
-
-- **Auto-Create**: Ideal for automatically generating cached objects and reducing code complexity.
-- **Manual-Create**: Suitable for scenarios requiring fine-grained control over data creation logic.
-- **Named Stores**: Useful for distinguishing data storage across different contexts.
-- **Non-Named Stores**: Best for simpler caching needs.
+Choose the appropriate method based on whether you need isolated named stores and whether you prefer automatic or manual value creation.
 
 ## Contributing
 
