@@ -1,21 +1,14 @@
 using System.Collections.Concurrent;
 
-namespace Aiursoft.InMemoryKvDb;
+namespace Aiursoft.InMemoryKvDb.ManualCreate;
 
-public class LruMemoryStore<T>(Func<Guid, T> onNotFound, int maxCachedItemsCount)
+public class LruMemoryStoreManualCreated<T>(int maxCachedItemsCount)
 {
-    private readonly Func<Guid, T> _onNotFound = onNotFound ?? throw new ArgumentNullException(nameof(onNotFound));
     private readonly ConcurrentDictionary<Guid, T> _store = new();
     private readonly LinkedList<Guid> _lruList = new();
     private readonly object _lruLock = new();
 
-    public T this[Guid id]
-    {
-        get => GetOrAdd(id);
-        set => AddToCache(id, value);
-    }
-
-    public T GetOrAdd(Guid id)
+    public T GetOrAdd(Guid id, Func<Guid, T> onNotFound)
     {
         if (_store.TryGetValue(id, out var value))
         {
@@ -23,11 +16,11 @@ public class LruMemoryStore<T>(Func<Guid, T> onNotFound, int maxCachedItemsCount
             return value;
         }
 
-        value = _onNotFound(id);
+        value = onNotFound(id);
         AddToCache(id, value);
         return value;
     }
-    
+
     public T? Get(Guid id)
     {
         if (_store.TryGetValue(id, out var value))
@@ -58,7 +51,7 @@ public class LruMemoryStore<T>(Func<Guid, T> onNotFound, int maxCachedItemsCount
         }
     }
 
-    private void AddToCache(Guid id, T value)
+    public void AddToCache(Guid id, T value)
     {
         lock (_lruLock)
         {

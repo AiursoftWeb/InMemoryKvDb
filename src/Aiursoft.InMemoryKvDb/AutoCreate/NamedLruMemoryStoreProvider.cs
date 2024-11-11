@@ -1,7 +1,7 @@
 ﻿
 using System.Collections.Concurrent;
 
-namespace Aiursoft.InMemoryKvDb;
+namespace Aiursoft.InMemoryKvDb.AutoCreate;
 
 public class NamedLruMemoryStoreProvider<T>(Func<Guid, T> onNotFound, int maxCachedItemsCount)
 {
@@ -15,14 +15,3 @@ public class NamedLruMemoryStoreProvider<T>(Func<Guid, T> onNotFound, int maxCac
         return _namedStores.GetOrAdd(dbName, _ => new LruMemoryStore<T>(onNotFound, maxCachedItemsCount));
     }
 }
-
-// Extension method for service registration
-
-// Example usage:
-// Registering the service
-// services.AddNamedLruMemoryStore<Player>(id => new Player(id) { NickName = "Anonymous " + new Random().Next(1000, 9999) }, 4096, 128);
-
-// Accessing a specific store by name
-// var namedProvider = serviceProvider.GetRequiredService<NamedLruMemoryStoreProvider<Player>>();
-// var normalPlayerDb = namedProvider.GetStore("NormalPlayerDb");
-// var highLevelPlayerDb = namedProvider.GetStore("HighLevelPlayerDb");

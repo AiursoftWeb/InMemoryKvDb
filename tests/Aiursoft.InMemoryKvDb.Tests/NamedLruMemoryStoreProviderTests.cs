@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Aiursoft.InMemoryKvDb.AutoCreate;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -183,11 +184,6 @@ public class NamedLruMemoryStoreProviderTests
         return dictionary.ContainsKey(playerId);
     }
 
-
-    // Basic Player class for testing purposes
-    private class Player(Guid id, string nickName)
-    {
-        public Guid Id { get; } = id;
-        public string NickName { get; } = nickName;
-    }
 }
+
+// Basic Player class for testing purposes
