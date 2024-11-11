@@ -76,8 +76,7 @@ public class NamedLruMemoryStoreProviderTests
         // Act
         services.AddNamedLruMemoryStore<Player>(
             id => new Player(id, "TestPlayer"),
-            maxCachedItemsCount: 3,
-            hotCacheItems: 1);
+            maxCachedItemsCount: 3);
 
         var serviceProvider = services.BuildServiceProvider();
         var namedProvider = serviceProvider.GetService<NamedLruMemoryStoreProvider<Player>>();
