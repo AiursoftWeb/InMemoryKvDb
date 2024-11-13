@@ -128,4 +128,38 @@ public class AdditionalCoverageTests
         // Assert
         Assert.IsNull(retrievedPlayer, "Get should return null (default) if the value is not in cache.");
     }
+    
+    [TestMethod]
+    public void Test_LruMemoryStoreManualCreated_Remove_ExistingKey()
+    {
+        // Arrange
+        var store = new LruMemoryStoreManualCreated<Player, Guid>(3);
+        var id = Guid.NewGuid();
+        var player = new Player(id, "PlayerToRemove");
+        store.AddToCache(id, player);
+
+        // Act
+        store.Remove(id);
+        var retrievedPlayer = store.Get(id);
+
+        // Assert
+        Assert.IsNull(retrievedPlayer, "Remove should delete the item from the cache.");
+    }
+
+    [TestMethod]
+    public void Test_LruMemoryStore_Remove_ExistingKey()
+    {
+        // Arrange
+        var store = new LruMemoryStore<Player, Guid>(id => new Player(id, $"Player-{id}"), 3);
+        var id = Guid.NewGuid();
+        var player = new Player(id, "PlayerToRemove");
+        store[id] = player; // Using indexer to add
+
+        // Act
+        store.Remove(id);
+        var retrievedPlayer = store.Get(id);
+
+        // Assert
+        Assert.IsNull(retrievedPlayer, "Remove should delete the item from the cache.");
+    }
 }
