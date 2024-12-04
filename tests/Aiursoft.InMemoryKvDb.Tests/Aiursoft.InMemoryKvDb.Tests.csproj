@@ -16,8 +16,8 @@
     <PackageReference Include="JunitXml.TestLogger" Version="4.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="3.6.3" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.6.3" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.6.4" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.6.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Aiursoft.InMemoryKvDb\Aiursoft.InMemoryKvDb.csproj" />
