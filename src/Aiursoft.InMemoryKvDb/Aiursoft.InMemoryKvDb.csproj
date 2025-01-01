@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Version>1.0.6</Version>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <AssemblyName>Aiursoft.InMemoryKvDb</AssemblyName>
     <RootNamespace>Aiursoft.InMemoryKvDb</RootNamespace>
     <IsTestProject>false</IsTestProject>
