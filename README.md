@@ -35,7 +35,7 @@ public class InMemoryDatabase : ISingletonDependency
 
 However, if a hacker keeps calling `GetOrAddPlayer` with a new `Guid`, the `Players` dictionary will grow infinitely. And cause you `OutOfMemoryException`.
 
-## Installation
+## How to install
 
 First, install `Aiursoft.InMemoryKvDb` to your ASP.NET Core project from [nuget.org](https://www.nuget.org/packages/Aiursoft.inmemorykvdb/):
 
