@@ -1,6 +1,5 @@
 using Aiursoft.InMemoryKvDb.AutoCreate;
 using Aiursoft.InMemoryKvDb.ManualCreate;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Aiursoft.InMemoryKvDb.Tests;
 
@@ -128,7 +127,7 @@ public class AdditionalCoverageTests
         // Assert
         Assert.IsNull(retrievedPlayer, "Get should return null (default) if the value is not in cache.");
     }
-    
+
     [TestMethod]
     public void Test_LruMemoryStoreManualCreated_Remove_ExistingKey()
     {
