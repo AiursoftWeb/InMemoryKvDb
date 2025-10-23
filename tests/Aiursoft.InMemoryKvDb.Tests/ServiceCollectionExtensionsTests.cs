@@ -1,7 +1,6 @@
 using Aiursoft.InMemoryKvDb.AutoCreate;
 using Aiursoft.InMemoryKvDb.ManualCreate;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Aiursoft.InMemoryKvDb.Tests;
 
@@ -25,7 +24,7 @@ public class ServiceCollectionExtensionsTests
         // Assert
         Assert.IsNotNull(store, "LruMemoryStore should be registered and resolved correctly.");
         var id = Guid.NewGuid();
-        var player = store.GetOrAdd(id);
+        var player = store!.GetOrAdd(id);
         Assert.AreEqual("TestPlayer", player.NickName, "Player nickname should match the provided 'onNotFound' logic.");
     }
 
@@ -44,7 +43,7 @@ public class ServiceCollectionExtensionsTests
         // Assert
         Assert.IsNotNull(store, "LruMemoryStoreManualCreated should be registered and resolved correctly.");
         var id = Guid.NewGuid();
-        var player = store.GetOrAdd(id, iid => new Player(iid, "TestPlayer"));
+        var player = store!.GetOrAdd(id, iid => new Player(iid, "TestPlayer"));
         Assert.AreEqual("TestPlayer", player.NickName, "Player nickname should match the manually provided logic.");
     }
 }

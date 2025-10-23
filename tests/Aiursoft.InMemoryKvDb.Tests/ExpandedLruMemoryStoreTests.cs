@@ -1,6 +1,7 @@
 using Aiursoft.InMemoryKvDb.AutoCreate;
 using Aiursoft.InMemoryKvDb.ManualCreate;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+[assembly: DoNotParallelize]
 
 namespace Aiursoft.InMemoryKvDb.Tests;
 
@@ -37,7 +38,7 @@ public class ExpandedLruMemoryStoreTests
         var allItems = store.GetAll().ToList();
 
         // Assert
-        Assert.AreEqual(2, allItems.Count);
+        Assert.HasCount(2, allItems);
         Assert.IsTrue(allItems.Any(p => p.NickName == "Player-" + id1));
         Assert.IsTrue(allItems.Any(p => p.NickName == "Player-" + id2));
     }
@@ -56,7 +57,7 @@ public class ExpandedLruMemoryStoreTests
         var allItemsWithKeys = store.GetAllWithKeys().ToList();
 
         // Assert
-        Assert.AreEqual(2, allItemsWithKeys.Count);
+        Assert.HasCount(2, allItemsWithKeys);
         Assert.IsTrue(allItemsWithKeys.Any(kv => kv.Key == id1));
         Assert.IsTrue(allItemsWithKeys.Any(kv => kv.Key == id2));
     }
@@ -110,7 +111,7 @@ public class ExpandedLruMemoryStoreTests
         var allItems = store.GetAll().ToList();
 
         // Assert
-        Assert.AreEqual(2, allItems.Count);
+        Assert.HasCount(2, allItems);
         Assert.IsTrue(allItems.Any(p => p.NickName == "Player1"));
         Assert.IsTrue(allItems.Any(p => p.NickName == "Player2"));
     }
@@ -129,7 +130,7 @@ public class ExpandedLruMemoryStoreTests
         var allItemsWithKeys = store.GetAllWithKeys().ToList();
 
         // Assert
-        Assert.AreEqual(2, allItemsWithKeys.Count);
+        Assert.HasCount(2, allItemsWithKeys);
         Assert.IsTrue(allItemsWithKeys.Any(kv => kv.Key == id1));
         Assert.IsTrue(allItemsWithKeys.Any(kv => kv.Key == id2));
     }
