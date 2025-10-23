@@ -1,6 +1,8 @@
 using Aiursoft.InMemoryKvDb.AutoCreate;
 using Aiursoft.InMemoryKvDb.ManualCreate;
 
+[assembly: DoNotParallelize]
+
 namespace Aiursoft.InMemoryKvDb.Tests;
 
 [TestClass]

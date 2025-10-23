@@ -50,7 +50,7 @@ public class AdditionalCoverageTests
 
         // Assert
         Assert.IsNotNull(retrievedPlayer, "Get should return the cached value if it exists.");
-        Assert.AreEqual("CachedPlayer", retrievedPlayer.NickName);
+        Assert.AreEqual("CachedPlayer", retrievedPlayer!.NickName);
     }
 
     [TestMethod]
@@ -111,7 +111,7 @@ public class AdditionalCoverageTests
 
         // Assert
         Assert.IsNotNull(retrievedPlayer, "Get should return the cached value if it exists.");
-        Assert.AreEqual("CachedPlayer", retrievedPlayer.NickName);
+        Assert.AreEqual("CachedPlayer", retrievedPlayer!.NickName);
     }
 
     [TestMethod]
