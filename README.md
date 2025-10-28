@@ -1,10 +1,10 @@
 # Aiursoft InMemoryKvDb
 
-[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://gitlab.aiursoft.cn/aiursoft/inmemorykvdb/-/blob/master/LICENSE)
-[![Pipeline stat](https://gitlab.aiursoft.cn/aiursoft/inmemorykvdb/badges/master/pipeline.svg)](https://gitlab.aiursoft.cn/aiursoft/inmemorykvdb/-/pipelines)
-[![Test Coverage](https://gitlab.aiursoft.cn/aiursoft/inmemorykvdb/badges/master/coverage.svg)](https://gitlab.aiursoft.cn/aiursoft/inmemorykvdb/-/pipelines)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://gitlab.aiursoft.com/aiursoft/inmemorykvdb/-/blob/master/LICENSE)
+[![Pipeline stat](https://gitlab.aiursoft.com/aiursoft/inmemorykvdb/badges/master/pipeline.svg)](https://gitlab.aiursoft.com/aiursoft/inmemorykvdb/-/pipelines)
+[![Test Coverage](https://gitlab.aiursoft.com/aiursoft/inmemorykvdb/badges/master/coverage.svg)](https://gitlab.aiursoft.com/aiursoft/inmemorykvdb/-/pipelines)
 [![NuGet version (Aiursoft.InMemoryKvDb)](https://img.shields.io/nuget/v/Aiursoft.inmemorykvdb.svg)](https://www.nuget.org/packages/Aiursoft.inmemorykvdb/)
-[![ManHours](https://manhours.aiursoft.cn/r/gitlab.aiursoft.cn/aiursoft/inmemorykvdb.svg)](https://gitlab.aiursoft.cn/aiursoft/inmemorykvdb/-/commits/master?ref_type=heads)
+[![ManHours](https://manhours.aiursoft.cn/r/gitlab.aiursoft.com/aiursoft/inmemorykvdb.svg)](https://gitlab.aiursoft.com/aiursoft/inmemorykvdb/-/commits/master?ref_type=heads)
 
 Aiursoft InMemoryKvDb is a lightweight, thread-safe, in-memory key-value database with support for automatic Least Recently Used (LRU) cache eviction. It allows for efficient storage and retrieval of key-value pairs while preventing unbounded memory usage by leveraging configurable LRU eviction policies.
 
