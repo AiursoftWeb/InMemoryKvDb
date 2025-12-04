@@ -4,7 +4,7 @@
 [![Pipeline stat](https://gitlab.aiursoft.com/aiursoft/inmemorykvdb/badges/master/pipeline.svg)](https://gitlab.aiursoft.com/aiursoft/inmemorykvdb/-/pipelines)
 [![Test Coverage](https://gitlab.aiursoft.com/aiursoft/inmemorykvdb/badges/master/coverage.svg)](https://gitlab.aiursoft.com/aiursoft/inmemorykvdb/-/pipelines)
 [![NuGet version (Aiursoft.InMemoryKvDb)](https://img.shields.io/nuget/v/Aiursoft.inmemorykvdb.svg)](https://www.nuget.org/packages/Aiursoft.inmemorykvdb/)
-[![ManHours](https://manhours.aiursoft.com/r/gitlab.aiursoft.com/aiursoft/inmemorykvdb.svg)](https://gitlab.aiursoft.com/aiursoft/inmemorykvdb/-/commits/master?ref_type=heads)
+[![Man hours](https://manhours.aiursoft.com/r/gitlab.aiursoft.com/aiursoft/inmemorykvdb.svg)](https://manhours.aiursoft.com/r/gitlab.aiursoft.com/aiursoft/inmemorykvdb.html)
 
 Aiursoft InMemoryKvDb is a lightweight, thread-safe, in-memory key-value database with support for automatic Least Recently Used (LRU) cache eviction. It allows for efficient storage and retrieval of key-value pairs while preventing unbounded memory usage by leveraging configurable LRU eviction policies.
 
