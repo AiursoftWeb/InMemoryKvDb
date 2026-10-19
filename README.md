@@ -1,6 +1,6 @@
 # Aiursoft InMemoryKvDb
 
-[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://gitlab.aiursoft.com/aiursoft/inmemorykvdb/-/blob/master/LICENSE)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/AiursoftWeb/inmemorykvdb/blob/master/LICENSE)
 [![Pipeline stat](https://gitlab.aiursoft.com/aiursoft/inmemorykvdb/badges/master/pipeline.svg)](https://gitlab.aiursoft.com/aiursoft/inmemorykvdb/-/pipelines)
 [![Test Coverage](https://gitlab.aiursoft.com/aiursoft/inmemorykvdb/badges/master/coverage.svg)](https://gitlab.aiursoft.com/aiursoft/inmemorykvdb/-/pipelines)
 [![NuGet version (Aiursoft.InMemoryKvDb)](https://img.shields.io/nuget/v/Aiursoft.inmemorykvdb.svg)](https://www.nuget.org/packages/Aiursoft.inmemorykvdb/)
